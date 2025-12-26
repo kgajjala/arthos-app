@@ -1,8 +1,9 @@
 """Stock data fetching and metric calculation service."""
 import yfinance as yf
 import pandas as pd
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 from datetime import datetime, timedelta
+from app.services.cache_service import get_cached_data, set_cached_data
 
 
 def fetch_stock_data(ticker: str) -> pd.DataFrame:
@@ -105,6 +106,7 @@ def calculate_signal(devstep: float) -> str:
 def get_stock_metrics(ticker: str) -> Dict[str, Any]:
     """
     Fetch stock data and calculate all required metrics.
+    Uses cache if available and not expired (24 hours).
     
     Args:
         ticker: Stock ticker symbol
@@ -118,9 +120,23 @@ def get_stock_metrics(ticker: str) -> Dict[str, Any]:
         - signal: Trading signal
         - current_price: Current stock price
         - data_points: Number of data points fetched
+        - cached: Boolean indicating if data came from cache
+        - cache_timestamp: ISO timestamp of cache entry (if cached)
     """
-    # Fetch stock data
-    data = fetch_stock_data(ticker)
+    cached_result = None
+    cache_timestamp = None
+    
+    # Try to get from cache first
+    cached_data = get_cached_data(ticker)
+    if cached_data:
+        data, cache_timestamp = cached_data
+        cached_result = True
+    else:
+        # Fetch from yfinance
+        data = fetch_stock_data(ticker)
+        # Cache the fetched data
+        set_cached_data(ticker, data)
+        cached_result = False
     
     # Calculate SMAs
     sma_50 = calculate_sma(data, 50)
@@ -135,13 +151,20 @@ def get_stock_metrics(ticker: str) -> Dict[str, Any]:
     # Get current price
     current_price = float(data['Close'].iloc[-1])
     
-    return {
+    result = {
         "ticker": ticker.upper(),
         "sma_50": round(sma_50, 2),
         "sma_200": round(sma_200, 2),
         "devstep": round(devstep, 4),
         "signal": signal,
         "current_price": round(current_price, 2),
-        "data_points": len(data)
+        "data_points": len(data),
+        "cached": cached_result
     }
+    
+    # Add cache_timestamp only if data was cached
+    if cached_result and cache_timestamp:
+        result["cache_timestamp"] = cache_timestamp.isoformat()
+    
+    return result
 

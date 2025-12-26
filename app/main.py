@@ -4,9 +4,16 @@ from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from pathlib import Path
 from app.services.stock_service import get_stock_metrics
+from app.database import create_db_and_tables
 
 # Initialize FastAPI app
 app = FastAPI(title="Arthos", description="Investment Analysis Platform")
+
+# Initialize database tables on startup
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database tables on application startup."""
+    create_db_and_tables()
 
 # Set up templates directory
 templates_dir = Path(__file__).parent / "templates"
@@ -28,6 +35,7 @@ async def home(request: Request):
 async def get_stock_data(q: str = Query(..., description="Stock ticker symbol")):
     """
     Fetch past 365 days of stock data and compute metrics.
+    Uses caching to avoid unnecessary yfinance API calls (24-hour cache).
     
     Args:
         q: Stock ticker symbol (e.g., 'AAPL', 'MSFT')
@@ -41,6 +49,8 @@ async def get_stock_data(q: str = Query(..., description="Stock ticker symbol"))
         - signal: Trading signal (Neutral, Overbought, etc.)
         - current_price: Current stock price
         - data_points: Number of data points fetched
+        - cached: Boolean indicating if data came from cache
+        - cache_timestamp: ISO timestamp of cache entry (only if cached=true)
     """
     if not q or not q.strip():
         raise HTTPException(status_code=400, detail="Ticker symbol (q) is required")

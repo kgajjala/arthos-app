@@ -168,3 +168,33 @@ def get_stock_metrics(ticker: str) -> Dict[str, Any]:
     
     return result
 
+
+def get_multiple_stock_metrics(tickers: list) -> list:
+    """
+    Fetch stock metrics for multiple tickers.
+    
+    Args:
+        tickers: List of stock ticker symbols
+        
+    Returns:
+        List of dictionaries containing metrics for each ticker.
+        Failed tickers will have an 'error' field instead of metrics.
+    """
+    results = []
+    for ticker in tickers:
+        ticker = ticker.strip().upper()
+        if not ticker:
+            continue
+        
+        try:
+            metrics = get_stock_metrics(ticker)
+            results.append(metrics)
+        except Exception as e:
+            # Add error entry for failed ticker
+            results.append({
+                "ticker": ticker,
+                "error": str(e)
+            })
+    
+    return results
+

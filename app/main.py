@@ -31,6 +31,48 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+@app.get("/results")
+async def results(request: Request, tickers: str = Query(..., description="Comma-separated stock tickers")):
+    """
+    Display stock metrics results page.
+    
+    Args:
+        tickers: Comma-separated list of stock ticker symbols
+        
+    Returns:
+        HTML page with stock metrics in a DataTable
+    """
+    from app.services.stock_service import get_multiple_stock_metrics
+    
+    if not tickers or not tickers.strip():
+        raise HTTPException(status_code=400, detail="At least one ticker symbol is required")
+    
+    # Parse tickers
+    ticker_list = [t.strip().upper() for t in tickers.split(',') if t.strip()]
+    
+    if not ticker_list:
+        raise HTTPException(status_code=400, detail="At least one valid ticker symbol is required")
+    
+    # Fetch metrics for all tickers
+    try:
+        metrics_list = get_multiple_stock_metrics(ticker_list)
+        # Format numbers for display
+        for metric in metrics_list:
+            if 'error' not in metric:
+                metric['current_price_formatted'] = f"${metric['current_price']:.2f}"
+                metric['sma_50_formatted'] = f"${metric['sma_50']:.2f}"
+                metric['sma_200_formatted'] = f"${metric['sma_200']:.2f}"
+                metric['devstep_formatted'] = f"{metric['devstep']:.4f}"
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching stock data: {str(e)}")
+    
+    return templates.TemplateResponse("results.html", {
+        "request": request,
+        "metrics": metrics_list,
+        "tickers": ticker_list
+    })
+
+
 @app.get("/v1/stock")
 async def get_stock_data(q: str = Query(..., description="Stock ticker symbol")):
     """

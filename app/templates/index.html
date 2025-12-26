@@ -6,23 +6,137 @@
     <title>Arthos - Investment Analysis</title>
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/static/arthos-favicon.svg">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #fff;
+        }
+        .logo-container {
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 72px;
+            font-weight: 400;
+            color: #4285f4;
+            margin: 0;
+        }
+        .search-container {
+            width: 100%;
+            max-width: 584px;
+            margin: 0 auto;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px 1px rgba(64,60,67,.16);
+        }
+        .search-box:hover {
+            box-shadow: 0 2px 8px 1px rgba(64,60,67,.24);
+        }
+        .search-box:focus-within {
+            box-shadow: 0 2px 8px 1px rgba(64,60,67,.24);
+            border-color: transparent;
+        }
+        #tickerInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 5px;
+        }
+        .explore-btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .explore-btn:hover {
+            background-color: #357ae8;
+        }
+        .hint-text {
+            font-size: 11px;
+            color: #70757a;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .error-message {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="banner bg-primary text-white text-center py-5 my-5">
-                    <h1 class="display-1">Welcome to Arthos!</h1>
-                    <p class="lead">Richer, Wiser, Happier</p>
-                </div>
+    <div class="logo-container">
+        <h1 class="logo">Arthos</h1>
+    </div>
+    
+    <div class="search-container">
+        <form id="searchForm" onsubmit="handleSearch(event)">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="tickerInput" 
+                    name="tickers" 
+                    placeholder="Enter stock tickers"
+                    autocomplete="off"
+                >
+                <button type="submit" class="explore-btn">Explore</button>
             </div>
-        </div>
+            <div class="hint-text">Enter comma-separated stock tickers (e.g., AAPL, MSFT, GOOGL)</div>
+            <div class="error-message" id="errorMessage"></div>
+        </form>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        function handleSearch(event) {
+            event.preventDefault();
+            const tickerInput = document.getElementById('tickerInput');
+            const errorMessage = document.getElementById('errorMessage');
+            const tickers = tickerInput.value.trim();
+            
+            // Hide previous error
+            errorMessage.style.display = 'none';
+            
+            if (!tickers) {
+                errorMessage.textContent = 'Please enter at least one stock ticker';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Redirect to results page with tickers as query parameter
+            const tickerList = tickers.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
+            if (tickerList.length === 0) {
+                errorMessage.textContent = 'Please enter at least one valid stock ticker';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            window.location.href = `/results?tickers=${encodeURIComponent(tickerList.join(','))}`;
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('tickerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch(e);
+            }
+        });
+    </script>
 </body>
 </html>
-

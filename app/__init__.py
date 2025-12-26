@@ -1,0 +1,2 @@
+"""Arthos application package."""
+

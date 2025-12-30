@@ -48,10 +48,23 @@ async def results(request: Request, tickers: str = Query(..., description="Comma
         raise HTTPException(status_code=400, detail="At least one ticker symbol is required")
     
     # Parse tickers
-    ticker_list = [t.strip().upper() for t in tickers.split(',') if t.strip()]
+    from app.services.ticker_validator import validate_ticker_list
+    raw_ticker_list = [t.strip().upper() for t in tickers.split(',') if t.strip()]
     
-    if not ticker_list:
+    if not raw_ticker_list:
         raise HTTPException(status_code=400, detail="At least one valid ticker symbol is required")
+    
+    # Validate ticker formats
+    valid_tickers, invalid_tickers = validate_ticker_list(raw_ticker_list)
+    
+    if invalid_tickers:
+        error_msg = f"Invalid ticker format(s): {', '.join(invalid_tickers)}. Tickers must be 1-5 alphanumeric characters."
+        raise HTTPException(status_code=400, detail=error_msg)
+    
+    if not valid_tickers:
+        raise HTTPException(status_code=400, detail="No valid ticker symbols found")
+    
+    ticker_list = valid_tickers
     
     # Fetch metrics for all tickers using FMP API (v2)
     try:
@@ -104,6 +117,45 @@ async def get_stock_data(q: str = Query(..., description="Stock ticker symbol"))
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/validate/tickers")
+async def validate_tickers(tickers: str = Query(..., description="Comma-separated stock tickers")):
+    """
+    Validate ticker format for a list of tickers.
+    
+    Args:
+        tickers: Comma-separated list of stock ticker symbols
+        
+    Returns:
+        JSON response with validation results:
+        - valid: List of valid tickers
+        - invalid: List of invalid tickers with error messages
+    """
+    from app.services.ticker_validator import validate_ticker_list
+    
+    if not tickers or not tickers.strip():
+        return {"valid": [], "invalid": []}
+    
+    # Parse tickers
+    raw_ticker_list = [t.strip().upper() for t in tickers.split(',') if t.strip()]
+    
+    if not raw_ticker_list:
+        return {"valid": [], "invalid": []}
+    
+    # Validate ticker formats
+    valid_tickers, invalid_tickers = validate_ticker_list(raw_ticker_list)
+    
+    # Format invalid tickers with error messages
+    invalid_with_errors = [
+        {"ticker": ticker, "error": "Invalid format. Tickers must be 1-5 alphanumeric characters."}
+        for ticker in invalid_tickers
+    ]
+    
+    return {
+        "valid": valid_tickers,
+        "invalid": invalid_with_errors
+    }
 
 
 @app.get("/v2/stock")

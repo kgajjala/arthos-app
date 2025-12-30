@@ -105,6 +105,15 @@
     </div>
 
     <script>
+        // Ticker format validation: 1-5 alphanumeric characters, may contain dot
+        function validateTickerFormat(ticker) {
+            const trimmed = ticker.trim().toUpperCase();
+            if (!trimmed) return false;
+            // Pattern: 1-5 alphanumeric characters, optionally followed by dot and 1-5 more alphanumeric
+            const pattern = /^[A-Z0-9]{1,5}(\.[A-Z0-9]{1,5})?$/;
+            return pattern.test(trimmed);
+        }
+        
         function handleSearch(event) {
             event.preventDefault();
             const tickerInput = document.getElementById('tickerInput');
@@ -120,14 +129,34 @@
                 return;
             }
             
-            // Redirect to results page with tickers as query parameter
+            // Parse and validate tickers
             const tickerList = tickers.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
+            
             if (tickerList.length === 0) {
                 errorMessage.textContent = 'Please enter at least one valid stock ticker';
                 errorMessage.style.display = 'block';
                 return;
             }
             
+            // Validate each ticker format
+            const invalidTickers = [];
+            for (const ticker of tickerList) {
+                if (!validateTickerFormat(ticker)) {
+                    invalidTickers.push(ticker);
+                }
+            }
+            
+            if (invalidTickers.length > 0) {
+                if (invalidTickers.length === 1) {
+                    errorMessage.textContent = `Invalid ticker format: ${invalidTickers[0]}. Tickers must be 1-5 alphanumeric characters (e.g., AAPL, MSFT).`;
+                } else {
+                    errorMessage.textContent = `Invalid ticker formats: ${invalidTickers.join(', ')}. Tickers must be 1-5 alphanumeric characters (e.g., AAPL, MSFT).`;
+                }
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // All tickers are valid, redirect to results page
             window.location.href = `/results?tickers=${encodeURIComponent(tickerList.join(','))}`;
         }
         

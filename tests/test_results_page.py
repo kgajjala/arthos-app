@@ -94,6 +94,32 @@ class TestResultsPageAPI:
         assert response.status_code == status.HTTP_200_OK
         assert "AAPL" in response.text
         assert "MSFT" in response.text
+    
+    def test_results_page_invalid_ticker_format(self, client):
+        """Test results page rejects invalid ticker formats."""
+        response = client.get("/results?tickers=INVALID12345")
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        data = response.json()
+        assert "Invalid ticker format" in data["detail"]
+        assert "INVALID12345" in data["detail"]
+    
+    def test_results_page_multiple_invalid_tickers(self, client):
+        """Test results page rejects multiple invalid ticker formats."""
+        response = client.get("/results?tickers=TOOLONG,INVALID@")
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        data = response.json()
+        assert "Invalid ticker format" in data["detail"]
+    
+    def test_results_page_mixed_valid_invalid_formats(self, client):
+        """Test results page rejects when mix of valid and invalid formats."""
+        response = client.get("/results?tickers=AAPL,INVALID12345,MSFT")
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        data = response.json()
+        assert "Invalid ticker format" in data["detail"]
+        assert "INVALID12345" in data["detail"]
 
 
 class TestHomePage:

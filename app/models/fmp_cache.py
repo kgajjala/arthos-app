@@ -1,0 +1,20 @@
+"""FMP cache model for storing FMP API responses."""
+from sqlmodel import SQLModel, Field
+from datetime import datetime
+from typing import Optional
+import json
+
+
+class FMPCache(SQLModel, table=True):
+    """Model for caching stock data from FMP API."""
+    
+    ticker: str = Field(primary_key=True, description="Stock ticker symbol")
+    data: str = Field(description="JSON string of cached stock data DataFrame")
+    cache_timestamp: datetime = Field(default_factory=datetime.now, description="When the cache entry was created")
+    
+    class Config:
+        """Pydantic config."""
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+

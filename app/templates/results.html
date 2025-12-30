@@ -37,7 +37,6 @@
                         <th>SMA 200</th>
                         <th>Devstep</th>
                         <th>Signal</th>
-                        <th>Data Points</th>
                         <th>Cached</th>
                         <th>Cache Timestamp</th>
                     </tr>
@@ -47,7 +46,7 @@
                     <tr class="{% if 'error' in metric %}table-danger{% endif %}">
                         <td><strong>{{ metric.ticker }}</strong></td>
                         {% if 'error' in metric %}
-                            <td colspan="8" class="text-danger fw-bold">{{ metric.error }}</td>
+                            <td colspan="7" class="text-danger fw-bold">{{ metric.error }}</td>
                         {% else %}
                             <td>{{ metric.current_price_formatted }}</td>
                             <td>{{ metric.sma_50_formatted }}</td>
@@ -68,7 +67,6 @@
                                     <span class="badge bg-secondary">{{ metric.signal }}</span>
                                 {% endif %}
                             </td>
-                            <td>{{ metric.data_points }}</td>
                             <td>
                                 {% if metric.cached %}
                                     <span class="badge bg-success">Yes</span>

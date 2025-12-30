@@ -42,7 +42,7 @@ async def results(request: Request, tickers: str = Query(..., description="Comma
     Returns:
         HTML page with stock metrics in a DataTable
     """
-    from app.services.stock_service import get_multiple_stock_metrics
+    from app.services.fmp_service import get_fmp_multiple_stock_metrics
     
     if not tickers or not tickers.strip():
         raise HTTPException(status_code=400, detail="At least one ticker symbol is required")
@@ -53,9 +53,9 @@ async def results(request: Request, tickers: str = Query(..., description="Comma
     if not ticker_list:
         raise HTTPException(status_code=400, detail="At least one valid ticker symbol is required")
     
-    # Fetch metrics for all tickers
+    # Fetch metrics for all tickers using FMP API (v2)
     try:
-        metrics_list = get_multiple_stock_metrics(ticker_list)
+        metrics_list = get_fmp_multiple_stock_metrics(ticker_list)
         # Format numbers for display
         for metric in metrics_list:
             if 'error' not in metric:
@@ -101,6 +101,43 @@ async def get_stock_data(q: str = Query(..., description="Stock ticker symbol"))
         metrics = get_stock_metrics(q.strip().upper())
         return metrics
     except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/v2/stock")
+async def get_fmp_stock_data(q: str = Query(..., description="Stock ticker symbol")):
+    """
+    Fetch past 365 days of stock data and compute metrics using FMP API.
+    Uses caching to avoid unnecessary FMP API calls (24-hour cache).
+    Always uses cache if available and not expired, even if API fails.
+    
+    Args:
+        q: Stock ticker symbol (e.g., 'AAPL', 'MSFT')
+        
+    Returns:
+        JSON response with stock metrics:
+        - ticker: Stock ticker
+        - sma_50: 50-day Simple Moving Average
+        - sma_200: 200-day Simple Moving Average
+        - devstep: Number of standard deviations from 50-day SMA
+        - signal: Trading signal (Neutral, Overbought, etc.)
+        - current_price: Current stock price
+        - data_points: Number of data points fetched
+        - cached: Boolean indicating if data came from cache
+        - cache_timestamp: ISO timestamp of cache entry (only if cached=true)
+    """
+    from app.services.fmp_service import get_fmp_stock_metrics
+    
+    if not q or not q.strip():
+        raise HTTPException(status_code=400, detail="Ticker symbol (q) is required")
+    
+    try:
+        metrics = get_fmp_stock_metrics(q.strip().upper())
+        return metrics
+    except ValueError as e:
+        # Pass FMP error messages directly to UI
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

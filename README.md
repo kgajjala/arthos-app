@@ -122,7 +122,7 @@ curl "http://localhost:8000/v1/stock?q=AAPL"
   "ticker": "AAPL",
   "sma_50": 150.25,
   "sma_200": 145.80,
-  "devstep": 1.2345,
+  "devstep": 1.2345,  # 50D STDDEV
   "signal": "Overbought",
   "current_price": 155.50,
   "data_points": 252,
@@ -135,7 +135,7 @@ curl "http://localhost:8000/v1/stock?q=AAPL"
 - `ticker`: Stock ticker symbol (uppercase)
 - `sma_50`: 50-day Simple Moving Average
 - `sma_200`: 200-day Simple Moving Average
-- `devstep`: Number of standard deviations from 50-day SMA
+- `devstep`: Number of standard deviations from 50-day SMA (displayed as "50D STDDEV")
 - `signal`: Trading signal (Neutral, Overbought, Extreme Overbought, Oversold, Extreme Oversold)
 - `current_price`: Current stock price
 - `data_points`: Number of data points fetched
@@ -196,7 +196,7 @@ curl "http://localhost:8000/stock/AAPL"
 Returns an HTML page with:
 - Interactive Plotly.js candlestick chart showing 365 days of price data
 - 50-day and 200-day SMA lines overlaid on the chart
-- Current metrics panel with price, SMAs, devstep, and signal
+- Current metrics panel with price, SMAs, 50D STDDEV, and signal
 
 ## Portfolio API Endpoints
 
@@ -452,7 +452,7 @@ Each stock has a dedicated detail page accessible by clicking the ticker symbol 
 
 - **Interactive Candlestick Chart**: Plotly.js-powered chart showing 365 days of daily price data
 - **SMA Overlays**: 50-day and 200-day Simple Moving Averages displayed as lines on the chart
-- **Current Metrics Panel**: Sidebar showing current price, SMAs, devstep, signal, and data points
+- **Current Metrics Panel**: Sidebar showing current price, SMAs, 50D STDDEV, and signal
 - **Responsive Design**: Chart and metrics adapt to different screen sizes
 - **Color-Coded Signals**: Visual badges matching the signal classification system
 

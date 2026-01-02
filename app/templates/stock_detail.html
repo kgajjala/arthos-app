@@ -78,7 +78,7 @@
                         <div class="metric-value">${{ "%.2f"|format(metrics.sma_200) }}</div>
                     </div>
                     <div class="metric-item">
-                        <div class="metric-label">Devstep</div>
+                        <div class="metric-label">50D STDDEV</div>
                         <div class="metric-value">{{ "%.4f"|format(metrics.devstep) }}</div>
                     </div>
                     <div class="metric-item">
@@ -98,10 +98,6 @@
                                 <span class="badge bg-secondary">{{ metrics.signal }}</span>
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-label">Data Points</div>
-                        <div class="metric-value">{{ metrics.data_points }}</div>
                     </div>
                 </div>
             </div>

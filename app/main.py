@@ -106,7 +106,7 @@ async def portfolio_details_page(request: Request, portfolio_id: UUID = FPath(..
                     metric['current_price_formatted'] = f"${metric['current_price']:.2f}"
                     metric['sma_50_formatted'] = f"${metric['sma_50']:.2f}"
                     metric['sma_200_formatted'] = f"${metric['sma_200']:.2f}"
-                    metric['devstep_formatted'] = f"{metric['devstep']:.4f}"
+                    metric['stddev_50d_formatted'] = f"{metric['devstep']:.4f}"
         except Exception as e:
             # If there's an error fetching metrics, still show the page with error messages
             pass
@@ -202,7 +202,7 @@ async def results(request: Request, tickers: str = Query(..., description="Comma
                 metric['current_price_formatted'] = f"${metric['current_price']:.2f}"
                 metric['sma_50_formatted'] = f"${metric['sma_50']:.2f}"
                 metric['sma_200_formatted'] = f"${metric['sma_200']:.2f}"
-                metric['devstep_formatted'] = f"{metric['devstep']:.4f}"
+                metric['stddev_50d_formatted'] = f"{metric['devstep']:.4f}"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching stock data: {str(e)}")
     
@@ -227,7 +227,7 @@ async def get_stock_data(q: str = Query(..., description="Stock ticker symbol"))
         - ticker: Stock ticker
         - sma_50: 50-day Simple Moving Average
         - sma_200: 200-day Simple Moving Average
-        - devstep: Number of standard deviations from 50-day SMA
+        - devstep: Number of standard deviations from 50-day SMA (50D STDDEV)
         - signal: Trading signal (Neutral, Overbought, etc.)
         - current_price: Current stock price
         - data_points: Number of data points fetched

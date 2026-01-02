@@ -8,7 +8,7 @@ import pandas as pd
 import json
 
 
-CACHE_EXPIRY_HOURS = 24
+CACHE_EXPIRY_HOURS = 1  # 60 minutes
 
 
 def get_cached_data(ticker: str) -> Optional[Tuple[pd.DataFrame, datetime]]:
@@ -28,7 +28,7 @@ def get_cached_data(ticker: str) -> Optional[Tuple[pd.DataFrame, datetime]]:
         if cache_entry is None:
             return None
         
-        # Check if cache is expired (older than 24 hours)
+        # Check if cache is expired (older than 60 minutes)
         age = datetime.now() - cache_entry.cache_timestamp
         if age > timedelta(hours=CACHE_EXPIRY_HOURS):
             # Cache expired, delete it
@@ -87,7 +87,7 @@ def set_cached_data(ticker: str, data: pd.DataFrame) -> None:
 
 def purge_expired_cache() -> int:
     """
-    Purge all expired cache entries (older than 24 hours).
+    Purge all expired cache entries (older than 60 minutes).
     
     Returns:
         Number of entries purged

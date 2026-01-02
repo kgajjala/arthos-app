@@ -90,7 +90,7 @@ async def results(request: Request, tickers: str = Query(..., description="Comma
 async def get_stock_data(q: str = Query(..., description="Stock ticker symbol")):
     """
     Fetch past 365 days of stock data and compute metrics.
-    Uses caching to avoid unnecessary yfinance API calls (24-hour cache).
+    Uses caching to avoid unnecessary yfinance API calls (60-minute cache).
     
     Args:
         q: Stock ticker symbol (e.g., 'AAPL', 'MSFT')

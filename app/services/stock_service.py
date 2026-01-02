@@ -106,7 +106,7 @@ def calculate_signal(devstep: float) -> str:
 def get_stock_metrics(ticker: str) -> Dict[str, Any]:
     """
     Fetch stock data and calculate all required metrics.
-    Uses cache if available and not expired (24 hours).
+    Uses cache if available and not expired (60 minutes).
     
     Args:
         ticker: Stock ticker symbol

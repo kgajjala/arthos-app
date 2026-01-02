@@ -9,7 +9,7 @@ Arthos is a Python web application for investment analysis, built with FastAPI, 
 - 📊 **Stock Data Analysis**: Fetch and analyze past 365 days of stock data
 - 📈 **Technical Indicators**: Calculate 50-day and 200-day Simple Moving Averages (SMA)
 - 🎯 **Trading Signals**: Generate trading signals based on standard deviation analysis
-- 💾 **Intelligent Caching**: 24-hour cache to reduce API calls to yfinance
+- 💾 **Intelligent Caching**: 60-minute cache to reduce API calls to yfinance
 - 🧪 **Comprehensive Testing**: Full test coverage with pytest
 - 🚀 **FastAPI Backend**: Modern, fast, and async-capable API
 
@@ -233,7 +233,7 @@ arthos-app/
 
 The application implements intelligent caching to reduce API calls to yfinance:
 
-- **Cache Duration**: 24 hours
+- **Cache Duration**: 60 minutes
 - **Automatic Expiration**: Expired cache entries are automatically deleted
 - **Cache Storage**: SQLite database (SQLModel)
 - **Cache Key**: Stock ticker symbol (case-insensitive)

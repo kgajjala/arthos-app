@@ -1,6 +1,7 @@
 """Database configuration using SQLModel."""
 from sqlmodel import SQLModel, create_engine, Session
 from app.models.stock_cache import StockCache  # Import to register with metadata
+from app.models.portfolio import Portfolio, PortfolioStock  # Import to register with metadata
 
 # Database URL - using SQLite for now, can be easily swapped for Postgres later
 DATABASE_URL = "sqlite:///arthos.db"

@@ -10,7 +10,9 @@ Arthos is a Python web application for investment analysis, built with FastAPI, 
 - 📈 **Technical Indicators**: Calculate 50-day and 200-day Simple Moving Averages (SMA)
 - 🎯 **Trading Signals**: Generate trading signals based on standard deviation analysis
 - 💾 **Intelligent Caching**: 60-minute cache to reduce API calls to yfinance
-- 🧪 **Comprehensive Testing**: Full test coverage with pytest
+- 📁 **Portfolio Management**: Create and manage stock portfolios with multiple stocks
+- ✏️ **Portfolio Editing**: Edit portfolio names and manage stocks within portfolios
+- 🧪 **Comprehensive Testing**: Full test coverage with pytest (unit, API, and browser tests)
 - 🚀 **FastAPI Backend**: Modern, fast, and async-capable API
 
 ## Prerequisites
@@ -83,6 +85,12 @@ Open your browser and navigate to:
 ```
 http://localhost:8000
 ```
+
+### Portfolio Management Pages
+
+- **Create Portfolio**: http://localhost:8000/create-portfolio
+- **List All Portfolios**: http://localhost:8000/portfolios
+- **Portfolio Details**: http://localhost:8000/portfolio/{portfolio_id}
 
 ## API Endpoints
 
@@ -163,6 +171,128 @@ curl "http://localhost:8000/validate/tickers?tickers=AAPL,MSFT,INVALID123"
 }
 ```
 
+## Portfolio API Endpoints
+
+### GET `/v1/portfolio`
+
+List all portfolios.
+
+**Example Request:**
+```bash
+curl "http://localhost:8000/v1/portfolio"
+```
+
+**Example Response:**
+```json
+{
+  "portfolios": [
+    {
+      "portfolio_id": "550e8400-e29b-41d4-a716-446655440000",
+      "portfolio_name": "My Portfolio",
+      "date_added": "2025-12-25T21:44:22.981176",
+      "date_modified": "2025-12-25T21:44:22.981176"
+    }
+  ]
+}
+```
+
+### GET `/v1/portfolio/{portfolio_id}`
+
+Get portfolio details including all stocks.
+
+**Example Request:**
+```bash
+curl "http://localhost:8000/v1/portfolio/550e8400-e29b-41d4-a716-446655440000"
+```
+
+**Example Response:**
+```json
+{
+  "portfolio_id": "550e8400-e29b-41d4-a716-446655440000",
+  "portfolio_name": "My Portfolio",
+  "date_added": "2025-12-25T21:44:22.981176",
+  "date_modified": "2025-12-25T21:44:22.981176",
+  "stocks": [
+    {
+      "ticker": "AAPL",
+      "date_added": "2025-12-25T21:45:00.000000"
+    }
+  ]
+}
+```
+
+### POST `/v1/portfolio`
+
+Create a new portfolio.
+
+**Request Body:**
+```json
+{
+  "portfolio_name": "My New Portfolio"
+}
+```
+
+**Example Request:**
+```bash
+curl -X POST "http://localhost:8000/v1/portfolio" \
+  -H "Content-Type: application/json" \
+  -d '{"portfolio_name": "My New Portfolio"}'
+```
+
+### PUT `/v1/portfolio/{portfolio_id}`
+
+Update portfolio name.
+
+**Request Body:**
+```json
+{
+  "portfolio_name": "Updated Portfolio Name"
+}
+```
+
+**Example Request:**
+```bash
+curl -X PUT "http://localhost:8000/v1/portfolio/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Content-Type: application/json" \
+  -d '{"portfolio_name": "Updated Portfolio Name"}'
+```
+
+### DELETE `/v1/portfolio/{portfolio_id}`
+
+Delete a portfolio and all its stocks (cascade delete).
+
+**Example Request:**
+```bash
+curl -X DELETE "http://localhost:8000/v1/portfolio/550e8400-e29b-41d4-a716-446655440000"
+```
+
+### POST `/v1/portfolio/{portfolio_id}/stocks`
+
+Add stocks to a portfolio. Duplicate stocks are automatically ignored.
+
+**Request Body:**
+```json
+{
+  "tickers": "AAPL,MSFT,GOOGL"
+}
+```
+
+**Example Request:**
+```bash
+curl -X POST "http://localhost:8000/v1/portfolio/550e8400-e29b-41d4-a716-446655440000/stocks" \
+  -H "Content-Type: application/json" \
+  -d '{"tickers": "AAPL,MSFT,GOOGL"}'
+```
+
+### DELETE `/v1/portfolio/{portfolio_id}/stocks/{ticker}`
+
+Remove a stock from a portfolio.
+
+**Example Request:**
+```bash
+curl -X DELETE "http://localhost:8000/v1/portfolio/550e8400-e29b-41d4-a716-446655440000/stocks/AAPL"
+```
+
 ## Testing
 
 ### Run All Tests
@@ -183,13 +313,17 @@ pytest --cov=app --cov-report=html
 
 ### Test Structure
 
-- `tests/test_api.py` - API endpoint tests
+- `tests/test_api.py` - Stock API endpoint tests
 - `tests/test_stock_service.py` - Stock service unit tests
 - `tests/test_cache_service.py` - Cache service tests
 - `tests/test_stock_service_caching.py` - Caching integration tests
 - `tests/test_ticker_validator.py` - Ticker validation tests
 - `tests/test_validation_api.py` - Validation API endpoint tests
 - `tests/test_results_page.py` - Results page tests
+- `tests/test_portfolio_models.py` - Portfolio model tests
+- `tests/test_portfolio_service.py` - Portfolio service unit tests
+- `tests/test_portfolio_api.py` - Portfolio API endpoint tests
+- `tests/test_portfolio_browser.py` - Portfolio browser tests (Playwright)
 
 ## Project Structure
 
@@ -201,27 +335,36 @@ arthos-app/
 │   ├── database.py           # Database configuration and setup
 │   ├── models/
 │   │   ├── __init__.py
-│   │   └── stock_cache.py    # StockCache SQLModel
+│   │   ├── stock_cache.py    # StockCache SQLModel
+│   │   └── portfolio.py      # Portfolio and PortfolioStock SQLModels
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── stock_service.py  # Stock data fetching and metrics
 │   │   ├── cache_service.py  # Caching operations
-│   │   └── ticker_validator.py  # Ticker format validation
+│   │   ├── ticker_validator.py  # Ticker format validation
+│   │   └── portfolio_service.py  # Portfolio management operations
 │   └── templates/
 │       ├── index.html        # Homepage template
-│       └── results.html       # Results page template
+│       ├── results.html      # Results page template
+│       ├── create_portfolio.html  # Create portfolio page
+│       ├── portfolios.html    # List portfolios page
+│       └── portfolio_details.html  # Portfolio details page
 ├── static/
 │   └── arthos-favicon.svg    # Favicon
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py           # Pytest configuration and fixtures
-│   ├── test_api.py           # API endpoint tests
+│   ├── test_api.py           # Stock API endpoint tests
 │   ├── test_stock_service.py  # Stock service tests
 │   ├── test_cache_service.py # Cache service tests
 │   ├── test_stock_service_caching.py  # Caching integration tests
 │   ├── test_ticker_validator.py  # Ticker validation tests
 │   ├── test_validation_api.py  # Validation API endpoint tests
-│   └── test_results_page.py  # Results page tests
+│   ├── test_results_page.py  # Results page tests
+│   ├── test_portfolio_models.py  # Portfolio model tests
+│   ├── test_portfolio_service.py  # Portfolio service tests
+│   ├── test_portfolio_api.py  # Portfolio API endpoint tests
+│   └── test_portfolio_browser.py  # Portfolio browser tests (Playwright)
 ├── run.py                    # Application startup script
 ├── pytest.ini                # Pytest configuration
 ├── requirements.txt           # Python dependencies
@@ -242,6 +385,33 @@ When a request is made:
 1. Check if valid cache exists (not expired)
 2. If cache exists, return cached data
 3. If cache is missing or expired, fetch from yfinance and cache the response
+
+## Portfolio Management
+
+The application includes a comprehensive portfolio management system:
+
+### Features
+
+- **Create Portfolios**: Create named portfolios to organize your stock analysis
+- **Add Stocks**: Add multiple stocks to a portfolio using comma-separated tickers
+- **Edit Portfolio Names**: Update portfolio names after creation
+- **Remove Stocks**: Delete individual stocks from portfolios
+- **View Portfolio Details**: See all stocks in a portfolio with their current metrics
+- **Cascade Delete**: Deleting a portfolio automatically removes all associated stocks
+- **Duplicate Prevention**: Adding the same stock twice to a portfolio is automatically ignored
+
+### Portfolio Name Validation
+
+- Alphanumeric characters and spaces only
+- Maximum 128 characters
+- Names are automatically trimmed of leading/trailing whitespace
+
+### Stock Management
+
+- Stocks are validated using the same ticker validation rules as the main search
+- Each portfolio can contain unique stocks only (no duplicates)
+- Stock metrics are displayed in a DataTable with the same columns as the results page
+- Custom sorting by Signal column (Extreme Oversold → Extreme Overbought)
 
 ## Development
 

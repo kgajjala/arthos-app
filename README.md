@@ -17,6 +17,36 @@ Arthos is a Python web application for investment analysis, built with FastAPI, 
 - 🧪 **Comprehensive Testing**: Full test coverage with pytest (unit, API, and browser tests)
 - 🚀 **FastAPI Backend**: Modern, fast, and async-capable API
 
+## Screenshots
+
+### Homepage
+![Homepage](docs/screenshots/homepage.png)
+
+The homepage allows you to enter stock tickers and explore their metrics.
+
+### Results Page
+![Results Page](docs/screenshots/results-page.png)
+
+View comprehensive stock metrics in a sortable, searchable table with custom signal sorting.
+
+### Stock Detail Page
+![Stock Detail Page](docs/screenshots/stock-detail.png)
+
+Interactive candlestick chart with 50-day and 200-day SMAs, plus standard deviation bands for detailed analysis.
+
+### Portfolio Management
+![Portfolios List](docs/screenshots/portfolios-list.png)
+
+View all your portfolios in one place.
+
+![Create Portfolio](docs/screenshots/create-portfolio.png)
+
+Create new portfolios with a simple form.
+
+![Portfolio Details](docs/screenshots/portfolio-details.png)
+
+Manage stocks within a portfolio, view metrics, and add or remove stocks.
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

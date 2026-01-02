@@ -88,7 +88,7 @@ http://localhost:8000
 
 ### GET `/v1/stock`
 
-Fetch stock data and compute technical metrics.
+Fetch stock data and compute technical metrics using yfinance.
 
 **Query Parameters:**
 - `q` (required): Stock ticker symbol (e.g., `AAPL`, `MSFT`, `GOOGL`)
@@ -124,6 +124,45 @@ curl "http://localhost:8000/v1/stock?q=AAPL"
 - `cached`: Boolean indicating if data came from cache
 - `cache_timestamp`: ISO timestamp of cache entry (only present when `cached=true`)
 
+### GET `/results`
+
+Display stock metrics results page for multiple tickers.
+
+**Query Parameters:**
+- `tickers` (required): Comma-separated list of stock ticker symbols (e.g., `AAPL,MSFT,GOOGL`)
+
+**Example Request:**
+```bash
+curl "http://localhost:8000/results?tickers=AAPL,MSFT"
+```
+
+Returns an HTML page with a DataTable showing metrics for all requested tickers.
+
+### GET `/validate/tickers`
+
+Validate ticker format for a list of tickers.
+
+**Query Parameters:**
+- `tickers` (required): Comma-separated list of stock ticker symbols
+
+**Example Request:**
+```bash
+curl "http://localhost:8000/validate/tickers?tickers=AAPL,MSFT,INVALID123"
+```
+
+**Example Response:**
+```json
+{
+  "valid": ["AAPL", "MSFT"],
+  "invalid": [
+    {
+      "ticker": "INVALID123",
+      "error": "Invalid format. Tickers must be 1-5 alphanumeric characters."
+    }
+  ]
+}
+```
+
 ## Testing
 
 ### Run All Tests
@@ -148,6 +187,9 @@ pytest --cov=app --cov-report=html
 - `tests/test_stock_service.py` - Stock service unit tests
 - `tests/test_cache_service.py` - Cache service tests
 - `tests/test_stock_service_caching.py` - Caching integration tests
+- `tests/test_ticker_validator.py` - Ticker validation tests
+- `tests/test_validation_api.py` - Validation API endpoint tests
+- `tests/test_results_page.py` - Results page tests
 
 ## Project Structure
 
@@ -163,9 +205,11 @@ arthos-app/
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── stock_service.py  # Stock data fetching and metrics
-│   │   └── cache_service.py  # Caching operations
+│   │   ├── cache_service.py  # Caching operations
+│   │   └── ticker_validator.py  # Ticker format validation
 │   └── templates/
-│       └── index.html        # Homepage template
+│       ├── index.html        # Homepage template
+│       └── results.html       # Results page template
 ├── static/
 │   └── arthos-favicon.svg    # Favicon
 ├── tests/
@@ -174,7 +218,10 @@ arthos-app/
 │   ├── test_api.py           # API endpoint tests
 │   ├── test_stock_service.py  # Stock service tests
 │   ├── test_cache_service.py # Cache service tests
-│   └── test_stock_service_caching.py  # Caching integration tests
+│   ├── test_stock_service_caching.py  # Caching integration tests
+│   ├── test_ticker_validator.py  # Ticker validation tests
+│   ├── test_validation_api.py  # Validation API endpoint tests
+│   └── test_results_page.py  # Results page tests
 ├── run.py                    # Application startup script
 ├── pytest.ini                # Pytest configuration
 ├── requirements.txt           # Python dependencies

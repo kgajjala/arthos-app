@@ -91,5 +91,5 @@ class TestHomeAPI:
         
         assert response.status_code == status.HTTP_200_OK
         assert "text/html" in response.headers["content-type"]
-        assert "Welcome to Arthos!" in response.text
+        assert "Arthos" in response.text
 

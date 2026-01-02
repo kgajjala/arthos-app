@@ -52,7 +52,7 @@
                             <td>{{ metric.sma_50_formatted }}</td>
                             <td>{{ metric.sma_200_formatted }}</td>
                             <td>{{ metric.devstep_formatted }}</td>
-                            <td>
+                            <td data-sort="{% if metric.signal == 'Extreme Oversold' %}5{% elif metric.signal == 'Oversold' %}4{% elif metric.signal == 'Neutral' %}3{% elif metric.signal == 'Overbought' %}2{% elif metric.signal == 'Extreme Overbought' %}1{% else %}0{% endif %}">
                                 {% if metric.signal == "Neutral" %}
                                     <span class="badge bg-secondary">{{ metric.signal }}</span>
                                 {% elif metric.signal == "Overbought" %}
@@ -92,11 +92,26 @@
     
     <script>
         $(document).ready(function() {
+            // Register custom sort type that uses data-sort attribute
+            $.fn.dataTable.ext.order['dom-data-sort'] = function(settings, col) {
+                return this.api().column(col, {order: 'index'}).nodes().map(function(td, i) {
+                    // Get the data-sort attribute value, or fallback to 0
+                    return parseInt($(td).attr('data-sort')) || 0;
+                });
+            };
+            
             $('#metricsTable').DataTable({
-                "pageLength": 25,
-                "order": [[0, "asc"]], // Sort by ticker
+                "pageLength": 100,
+                "order": [[5, "desc"]], // Sort by Signal column descending (Extreme Oversold=5 first)
                 "columnDefs": [
-                    { "orderable": true, "targets": "_all" }
+                    { 
+                        "type": "dom-data-sort",
+                        "targets": [5] // Signal column (0-indexed)
+                    },
+                    { 
+                        "orderable": true, 
+                        "targets": "_all" 
+                    }
                 ]
             });
         });

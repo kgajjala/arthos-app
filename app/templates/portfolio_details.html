@@ -103,7 +103,15 @@
                 <tbody>
                     {% for metric in metrics %}
                     <tr class="{% if 'error' in metric %}table-danger{% endif %}">
-                        <td><strong>{{ metric.ticker }}</strong></td>
+                        <td>
+                            {% if 'error' not in metric %}
+                                <a href="/stock/{{ metric.ticker }}" class="text-decoration-none">
+                                    <strong>{{ metric.ticker }}</strong>
+                                </a>
+                            {% else %}
+                                <strong>{{ metric.ticker }}</strong>
+                            {% endif %}
+                        </td>
                         {% if 'error' in metric %}
                             <td colspan="8" class="text-danger fw-bold">{{ metric.error }}</td>
                         {% else %}

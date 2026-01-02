@@ -9,9 +9,11 @@ Arthos is a Python web application for investment analysis, built with FastAPI, 
 - 📊 **Stock Data Analysis**: Fetch and analyze past 365 days of stock data
 - 📈 **Technical Indicators**: Calculate 50-day and 200-day Simple Moving Averages (SMA)
 - 🎯 **Trading Signals**: Generate trading signals based on standard deviation analysis
+- 📉 **Interactive Charts**: Candlestick charts with SMA overlays for detailed stock analysis
 - 💾 **Intelligent Caching**: 60-minute cache to reduce API calls to yfinance
 - 📁 **Portfolio Management**: Create and manage stock portfolios with multiple stocks
 - ✏️ **Portfolio Editing**: Edit portfolio names and manage stocks within portfolios
+- 🔗 **Stock Detail Pages**: Click any ticker to view detailed charts and metrics
 - 🧪 **Comprehensive Testing**: Full test coverage with pytest (unit, API, and browser tests)
 - 🚀 **FastAPI Backend**: Modern, fast, and async-capable API
 
@@ -92,6 +94,14 @@ http://localhost:8000
 - **List All Portfolios**: http://localhost:8000/portfolios
 - **Portfolio Details**: http://localhost:8000/portfolio/{portfolio_id}
 
+### Stock Detail Page
+
+- **Stock Details**: http://localhost:8000/stock/{ticker}
+  - Interactive candlestick chart showing 365 days of price data
+  - 50-day and 200-day SMA lines overlaid on the chart
+  - Current metrics display panel
+  - Accessible by clicking any ticker symbol in results or portfolio tables
+
 ## API Endpoints
 
 ### GET `/v1/stock`
@@ -170,6 +180,23 @@ curl "http://localhost:8000/validate/tickers?tickers=AAPL,MSFT,INVALID123"
   ]
 }
 ```
+
+### GET `/stock/{ticker}`
+
+Display stock detail page with interactive candlestick chart.
+
+**Path Parameters:**
+- `ticker` (required): Stock ticker symbol (e.g., `AAPL`, `MSFT`)
+
+**Example Request:**
+```bash
+curl "http://localhost:8000/stock/AAPL"
+```
+
+Returns an HTML page with:
+- Interactive Plotly.js candlestick chart showing 365 days of price data
+- 50-day and 200-day SMA lines overlaid on the chart
+- Current metrics panel with price, SMAs, devstep, and signal
 
 ## Portfolio API Endpoints
 
@@ -324,6 +351,8 @@ pytest --cov=app --cov-report=html
 - `tests/test_portfolio_service.py` - Portfolio service unit tests
 - `tests/test_portfolio_api.py` - Portfolio API endpoint tests
 - `tests/test_portfolio_browser.py` - Portfolio browser tests (Playwright)
+- `tests/test_stock_chart_service.py` - Stock chart service tests
+- `tests/test_stock_detail_api.py` - Stock detail page API tests
 
 ## Project Structure
 
@@ -340,12 +369,14 @@ arthos-app/
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── stock_service.py  # Stock data fetching and metrics
+│   │   ├── stock_chart_service.py  # Stock chart data preparation
 │   │   ├── cache_service.py  # Caching operations
 │   │   ├── ticker_validator.py  # Ticker format validation
 │   │   └── portfolio_service.py  # Portfolio management operations
 │   └── templates/
 │       ├── index.html        # Homepage template
 │       ├── results.html      # Results page template
+│       ├── stock_detail.html  # Stock detail page with chart
 │       ├── create_portfolio.html  # Create portfolio page
 │       ├── portfolios.html    # List portfolios page
 │       └── portfolio_details.html  # Portfolio details page
@@ -412,6 +443,25 @@ The application includes a comprehensive portfolio management system:
 - Each portfolio can contain unique stocks only (no duplicates)
 - Stock metrics are displayed in a DataTable with the same columns as the results page
 - Custom sorting by Signal column (Extreme Oversold → Extreme Overbought)
+
+## Stock Detail Pages
+
+Each stock has a dedicated detail page accessible by clicking the ticker symbol in any table:
+
+### Features
+
+- **Interactive Candlestick Chart**: Plotly.js-powered chart showing 365 days of daily price data
+- **SMA Overlays**: 50-day and 200-day Simple Moving Averages displayed as lines on the chart
+- **Current Metrics Panel**: Sidebar showing current price, SMAs, devstep, signal, and data points
+- **Responsive Design**: Chart and metrics adapt to different screen sizes
+- **Color-Coded Signals**: Visual badges matching the signal classification system
+
+### Chart Features
+
+- **Candlestick Visualization**: Green candles for price increases, red for decreases
+- **Interactive Tooltips**: Hover over any point to see detailed price information
+- **Zoom and Pan**: Built-in Plotly.js controls for exploring the data
+- **Date Range**: Automatically shows the past 365 days of trading data
 
 ## Development
 

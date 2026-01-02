@@ -123,6 +123,41 @@ async def portfolio_details_page(request: Request, portfolio_id: UUID = FPath(..
     })
 
 
+@app.get("/stock/{ticker}")
+async def stock_detail(request: Request, ticker: str = FPath(...)):
+    """
+    Display stock detail page with candlestick chart.
+    
+    Args:
+        ticker: Stock ticker symbol
+        
+    Returns:
+        HTML page with stock chart and metrics
+    """
+    from app.services.stock_chart_service import get_stock_chart_data
+    from app.services.stock_service import get_stock_metrics
+    
+    ticker = ticker.strip().upper()
+    
+    try:
+        # Get chart data
+        chart_data = get_stock_chart_data(ticker)
+        
+        # Get metrics for display
+        metrics = get_stock_metrics(ticker)
+        
+        return templates.TemplateResponse("stock_detail.html", {
+            "request": request,
+            "ticker": ticker,
+            "chart_data": chart_data,
+            "metrics": metrics
+        })
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching stock data: {str(e)}")
+
+
 @app.get("/results")
 async def results(request: Request, tickers: str = Query(..., description="Comma-separated stock tickers")):
     """

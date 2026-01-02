@@ -58,7 +58,7 @@
         <div class="row">
             <div class="col-lg-9">
                 <div class="chart-container">
-                    <h5 class="mb-3">Price Chart (365 Days)</h5>
+                    <h5 class="mb-3">Price Chart (Past 365 Days)</h5>
                     <div id="stockChart" style="height: 600px;"></div>
                 </div>
             </div>
@@ -112,34 +112,68 @@
         const candlestickData = {{ chart_data.candlestick_data | tojson }};
         const sma50Data = {{ chart_data.sma_50 | tojson }};
         const sma200Data = {{ chart_data.sma_200 | tojson }};
+        const stdBands = {{ chart_data.std_bands | tojson }};
         
-        // Create candlestick trace
-        const candlestickTrace = {
-            x: candlestickData.map(d => d.x),
-            open: candlestickData.map(d => d.open),
-            high: candlestickData.map(d => d.high),
-            low: candlestickData.map(d => d.low),
-            close: candlestickData.map(d => d.close),
-            type: 'candlestick',
-            name: 'Price',
-            increasing: {line: {color: '#26a69a'}},
-            decreasing: {line: {color: '#ef5350'}}
-        };
-        
-        // Create SMA 50 trace
-        const sma50Trace = {
-            x: sma50Data.map(d => d.x),
-            y: sma50Data.map(d => d.y),
+        // Create STD dev bands as area charts (background layers)
+        // 2 STD band (outer)
+        const std2Upper = stdBands.std_2_upper.map(d => d.y);
+        const std2Lower = stdBands.std_2_lower.map(d => d.y);
+        const std2UpperTrace = {
+            x: stdBands.std_2_upper.map(d => d.x),
+            y: std2Upper,
             type: 'scatter',
             mode: 'lines',
-            name: 'SMA 50',
-            line: {
-                color: '#ff9800',
-                width: 2
-            }
+            name: '±2 STD',
+            line: {width: 0},
+            fillcolor: 'rgba(200, 200, 200, 0.2)',
+            fill: 'tonexty',
+            showlegend: false,
+            hoverinfo: 'skip'
+        };
+        const std2LowerTrace = {
+            x: stdBands.std_2_lower.map(d => d.x),
+            y: std2Lower,
+            type: 'scatter',
+            mode: 'lines',
+            name: '±2 STD',
+            line: {width: 0},
+            fillcolor: 'rgba(200, 200, 200, 0.2)',
+            fill: 'tonexty',
+            showlegend: true,
+            legendgroup: 'std2',
+            hoverinfo: 'skip'
         };
         
-        // Create SMA 200 trace
+        // 1 STD band (inner)
+        const std1Upper = stdBands.std_1_upper.map(d => d.y);
+        const std1Lower = stdBands.std_1_lower.map(d => d.y);
+        const std1UpperTrace = {
+            x: stdBands.std_1_upper.map(d => d.x),
+            y: std1Upper,
+            type: 'scatter',
+            mode: 'lines',
+            name: '±1 STD',
+            line: {width: 0},
+            fillcolor: 'rgba(150, 150, 150, 0.15)',
+            fill: 'tonexty',
+            showlegend: false,
+            hoverinfo: 'skip'
+        };
+        const std1LowerTrace = {
+            x: stdBands.std_1_lower.map(d => d.x),
+            y: std1Lower,
+            type: 'scatter',
+            mode: 'lines',
+            name: '±1 STD',
+            line: {width: 0},
+            fillcolor: 'rgba(150, 150, 150, 0.15)',
+            fill: 'tonexty',
+            showlegend: true,
+            legendgroup: 'std1',
+            hoverinfo: 'skip'
+        };
+        
+        // Create SMA 200 trace (background line)
         const sma200Trace = {
             x: sma200Data.map(d => d.x),
             y: sma200Data.map(d => d.y),
@@ -152,7 +186,66 @@
             }
         };
         
-        const data = [candlestickTrace, sma50Trace, sma200Trace];
+        // Create SMA 50 trace (foreground line)
+        const sma50Trace = {
+            x: sma50Data.map(d => d.x),
+            y: sma50Data.map(d => d.y),
+            type: 'scatter',
+            mode: 'lines',
+            name: 'SMA 50',
+            line: {
+                color: '#ff9800',
+                width: 2
+            }
+        };
+        
+        // Create candlestick trace (foreground)
+        const candlestickTrace = {
+            x: candlestickData.map(d => d.x),
+            open: candlestickData.map(d => d.open),
+            high: candlestickData.map(d => d.high),
+            low: candlestickData.map(d => d.low),
+            close: candlestickData.map(d => d.close),
+            type: 'candlestick',
+            name: 'Price',
+            increasing: {line: {color: '#26a69a'}},
+            decreasing: {line: {color: '#ef5350'}}
+        };
+        
+        // Order matters: background layers first, then foreground
+        // We need to create proper area fills by pairing upper and lower bounds
+        // For Plotly area charts, we need to combine upper and lower in a single trace
+        const dates = stdBands.std_2_upper.map(d => d.x);
+        
+        // 2 STD band area
+        const std2AreaTrace = {
+            x: dates.concat(dates.slice().reverse()),
+            y: std2Upper.concat(std2Lower.slice().reverse()),
+            type: 'scatter',
+            mode: 'lines',
+            name: '±2 STD',
+            fill: 'toself',
+            fillcolor: 'rgba(200, 200, 200, 0.2)',
+            line: {color: 'transparent'},
+            showlegend: true,
+            hoverinfo: 'skip'
+        };
+        
+        // 1 STD band area
+        const std1AreaTrace = {
+            x: dates.concat(dates.slice().reverse()),
+            y: std1Upper.concat(std1Lower.slice().reverse()),
+            type: 'scatter',
+            mode: 'lines',
+            name: '±1 STD',
+            fill: 'toself',
+            fillcolor: 'rgba(150, 150, 150, 0.15)',
+            line: {color: 'transparent'},
+            showlegend: true,
+            hoverinfo: 'skip'
+        };
+        
+        const data = [std2AreaTrace, std1AreaTrace, sma200Trace, sma50Trace, candlestickTrace];
         
         const layout = {
             title: {

@@ -6,7 +6,7 @@ Arthos is a Python web application for investment analysis, built with FastAPI, 
 
 ## Features
 
-- 📊 **Stock Data Analysis**: Fetch and analyze past 365 days of stock data
+- 📊 **Stock Data Analysis**: Fetch and analyze stock data (2 years fetched, 365 days displayed)
 - 📈 **Technical Indicators**: Calculate 50-day and 200-day Simple Moving Averages (SMA)
 - 🎯 **Trading Signals**: Generate trading signals based on standard deviation analysis
 - 📉 **Interactive Charts**: Candlestick charts with SMA overlays for detailed stock analysis
@@ -452,6 +452,7 @@ Each stock has a dedicated detail page accessible by clicking the ticker symbol 
 
 - **Interactive Candlestick Chart**: Plotly.js-powered chart showing 365 days of daily price data
 - **SMA Overlays**: 50-day and 200-day Simple Moving Averages displayed as lines on the chart
+- **Standard Deviation Bands**: Light-colored shaded areas showing ±1 and ±2 standard deviation bands around the 50-day SMA
 - **Current Metrics Panel**: Sidebar showing current price, SMAs, 50D STDDEV, and signal
 - **Responsive Design**: Chart and metrics adapt to different screen sizes
 - **Color-Coded Signals**: Visual badges matching the signal classification system
@@ -459,9 +460,10 @@ Each stock has a dedicated detail page accessible by clicking the ticker symbol 
 ### Chart Features
 
 - **Candlestick Visualization**: Green candles for price increases, red for decreases
+- **Standard Deviation Bands**: Light gray shaded areas showing ±1 STD (inner) and ±2 STD (outer) bands around the 50-day SMA
 - **Interactive Tooltips**: Hover over any point to see detailed price information
 - **Zoom and Pan**: Built-in Plotly.js controls for exploring the data
-- **Date Range**: Automatically shows the past 365 days of trading data
+- **Date Range**: Displays the past 365 days of trading data (fetches 2 years to enable proper SMA calculations)
 
 ## Development
 

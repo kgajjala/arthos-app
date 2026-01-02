@@ -8,7 +8,7 @@ from app.services.cache_service import get_cached_data, set_cached_data
 
 def fetch_stock_data(ticker: str) -> pd.DataFrame:
     """
-    Fetch past 365 days of stock data for a given ticker.
+    Fetch past 2 years of stock data for a given ticker.
     
     Args:
         ticker: Stock ticker symbol (e.g., 'AAPL', 'MSFT')
@@ -21,9 +21,9 @@ def fetch_stock_data(ticker: str) -> pd.DataFrame:
     """
     try:
         stock = yf.Ticker(ticker)
-        # Fetch past 1 year of data
+        # Fetch past 2 years of data to enable proper SMA calculations
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=365)
+        start_date = end_date - timedelta(days=730)  # 2 years
         
         hist = stock.history(start=start_date, end=end_date)
         
@@ -107,6 +107,7 @@ def get_stock_metrics(ticker: str) -> Dict[str, Any]:
     """
     Fetch stock data and calculate all required metrics.
     Uses cache if available and not expired (60 minutes).
+    Fetches 2 years of data to enable proper SMA calculations.
     
     Args:
         ticker: Stock ticker symbol

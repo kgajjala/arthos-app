@@ -30,9 +30,17 @@ def get_stock_chart_data(ticker: str) -> Dict[str, Any]:
         ValueError: If ticker is invalid or data cannot be fetched
     """
     # Try to get from cache first
+    # We need at least 565 days of data (365 for display + 200 for SMA calculation)
     cached_data = get_cached_data(ticker)
     if cached_data:
         data, _ = cached_data
+        # Check if cached data has enough days for proper SMA calculations
+        # We need at least 565 days (365 display + 200 for SMA 200 calculation)
+        if len(data) < 565:
+            # Cached data doesn't have enough days, fetch fresh data
+            data = fetch_stock_data(ticker)
+            # Cache the fetched data
+            set_cached_data(ticker, data)
     else:
         # Fetch from yfinance
         data = fetch_stock_data(ticker)
@@ -59,8 +67,27 @@ def get_stock_chart_data(ticker: str) -> Dict[str, Any]:
     data['SMA_50_minus_1std'] = data['SMA_50'] - data['STD_50']
     data['SMA_50_minus_2std'] = data['SMA_50'] - (2 * data['STD_50'])
     
-    # Get only the last 365 days for display
-    display_data = data.tail(365)
+    # Filter to show data from Jan 1, 2025 onwards (or last 365 days if Jan 1, 2025 is not available)
+    # Handle timezone-aware index by normalizing to timezone-naive for comparison
+    data_index = data.index
+    if data_index.tz is not None:
+        # If index is timezone-aware, normalize it for comparison
+        data_index_normalized = data_index.tz_localize(None)
+        jan_1_2025 = pd.Timestamp('2025-01-01')
+        # Filter using normalized index
+        mask = data_index_normalized >= jan_1_2025
+        data_from_jan_1 = data[mask]
+    else:
+        # Index is timezone-naive
+        jan_1_2025 = pd.Timestamp('2025-01-01')
+        data_from_jan_1 = data[data.index >= jan_1_2025]
+    
+    if len(data_from_jan_1) > 0:
+        # We have data from Jan 1, 2025, show up to 365 days from that point
+        display_data = data_from_jan_1.head(365)
+    else:
+        # Jan 1, 2025 data not available (might be future date or no trading day), show last 365 days
+        display_data = data.tail(365)
     
     # Prepare candlestick data (last 365 days)
     candlestick_data = []

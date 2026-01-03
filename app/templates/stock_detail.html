@@ -52,11 +52,6 @@
             gap: 8px;
             width: 100%;
         }
-        .trading-range-current {
-            font-size: 0.9em;
-            font-weight: 600;
-            color: #333;
-        }
         .trading-range-bar {
             position: relative;
             height: 28px;
@@ -134,6 +129,24 @@
                         <div class="metric-value">${{ "%.2f"|format(metrics.sma_200) }}</div>
                     </div>
                     <div class="metric-item">
+                        <div class="metric-label">Signal</div>
+                        <div class="metric-value">
+                            {% if metrics.signal == "Extreme Oversold" %}
+                                <span class="badge bg-success">Extreme OS</span>
+                            {% elif metrics.signal == "Oversold" %}
+                                <span class="badge bg-info text-dark">Oversold</span>
+                            {% elif metrics.signal == "Neutral" %}
+                                <span class="badge bg-secondary">Neutral</span>
+                            {% elif metrics.signal == "Overbought" %}
+                                <span class="badge bg-warning text-dark">Overbought</span>
+                            {% elif metrics.signal == "Extreme Overbought" %}
+                                <span class="badge bg-danger">Extreme OB</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ metrics.signal }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="metric-item">
                         <div class="metric-label">Trading Range</div>
                         <div class="metric-value">
                             {% set dot_position = (50 + (metrics.devstep / 3) * 50) %}
@@ -144,30 +157,8 @@
                             {% endif %}
                             {% set dot_color = "#28a745" if metrics.devstep < -1 else ("#6c757d" if metrics.devstep <= 1 else "#dc3545") %}
                             <div class="trading-range-container">
-                                <div class="trading-range-current">
-                                    {% if metrics.signal == "Extreme Oversold" %}
-                                        <span class="badge bg-success">Extreme OS</span>
-                                    {% elif metrics.signal == "Oversold" %}
-                                        <span class="badge bg-info text-dark">Oversold</span>
-                                    {% elif metrics.signal == "Neutral" %}
-                                        <span class="badge bg-secondary">Neutral</span>
-                                    {% elif metrics.signal == "Overbought" %}
-                                        <span class="badge bg-warning text-dark">Overbought</span>
-                                    {% elif metrics.signal == "Extreme Overbought" %}
-                                        <span class="badge bg-danger">Extreme OB</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">{{ metrics.signal }}</span>
-                                    {% endif %}
-                                </div>
                                 <div class="trading-range-bar">
                                     <div class="trading-range-dma-line"></div>
-                                    {% if dot_position != 50 %}
-                                        {% if dot_position < 50 %}
-                                            <div class="trading-range-tail" style="left: {{ dot_position|round(1) }}%; width: {{ (50 - dot_position)|round(1) }}%;"></div>
-                                        {% else %}
-                                            <div class="trading-range-tail" style="left: 50%; width: {{ (dot_position - 50)|round(1) }}%;"></div>
-                                        {% endif %}
-                                    {% endif %}
                                     <div class="trading-range-dot" style="left: {{ dot_position|round(1) }}%; background-color: {{ dot_color }};"></div>
                                 </div>
                                 <div class="trading-range-labels">

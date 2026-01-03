@@ -18,6 +18,58 @@
         .header h1 {
             color: #4285f4;
         }
+        .trading-range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 200px;
+        }
+        .trading-range-current {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #333;
+        }
+        .trading-range-bar {
+            position: relative;
+            height: 24px;
+            background: linear-gradient(to right, 
+                rgba(60, 179, 113, 0.4) 0%, 
+                rgba(60, 179, 113, 0.4) 33.33%,
+                rgba(150, 150, 150, 0.2) 33.33%,
+                rgba(150, 150, 150, 0.2) 66.67%,
+                rgba(255, 182, 193, 0.4) 66.67%,
+                rgba(255, 182, 193, 0.4) 100%);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: visible;
+        }
+        .trading-range-dma-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #000;
+            z-index: 1;
+        }
+        .trading-range-dot {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            z-index: 2;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+        .trading-range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -37,6 +89,7 @@
                         <th>SMA 200</th>
                         <th>50D STDDEV</th>
                         <th>Signal</th>
+                        <th>Trading Range</th>
                         <th>Cached</th>
                         <th>Cache Timestamp</th>
                     </tr>
@@ -54,7 +107,7 @@
                             {% endif %}
                         </td>
                         {% if 'error' in metric %}
-                            <td colspan="7" class="text-danger fw-bold">{{ metric.error }}</td>
+                            <td colspan="8" class="text-danger fw-bold">{{ metric.error }}</td>
                         {% else %}
                             <td>{{ metric.current_price_formatted }}</td>
                             <td>{{ metric.sma_50_formatted }}</td>
@@ -74,6 +127,41 @@
                                 {% else %}
                                     <span class="badge bg-secondary">{{ metric.signal }}</span>
                                 {% endif %}
+                            </td>
+                            <td>
+                                {% set dot_position = (50 + (metric.devstep / 3) * 50) %}
+                                {% if dot_position < 0 %}
+                                    {% set dot_position = 0 %}
+                                {% elif dot_position > 100 %}
+                                    {% set dot_position = 100 %}
+                                {% endif %}
+                                {% set dot_color = "#28a745" if metric.devstep < -1 else ("#6c757d" if metric.devstep <= 1 else "#dc3545") %}
+                                <div class="trading-range-container">
+                                    <div class="trading-range-current">
+                                        {% if metric.signal == "Extreme Oversold" %}
+                                            Extreme OS
+                                        {% elif metric.signal == "Oversold" %}
+                                            Oversold
+                                        {% elif metric.signal == "Neutral" %}
+                                            Neutral
+                                        {% elif metric.signal == "Overbought" %}
+                                            Overbought
+                                        {% elif metric.signal == "Extreme Overbought" %}
+                                            Extreme OB
+                                        {% else %}
+                                            {{ metric.signal }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="trading-range-bar">
+                                        <div class="trading-range-dma-line"></div>
+                                        <div class="trading-range-dot" style="left: {{ dot_position|round(1) }}%; background-color: {{ dot_color }};"></div>
+                                    </div>
+                                    <div class="trading-range-labels">
+                                        <span>OS</span>
+                                        <span>50-DMA</span>
+                                        <span>OB</span>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 {% if metric.cached %}
@@ -115,6 +203,10 @@
                     { 
                         "type": "dom-data-sort",
                         "targets": [5] // Signal column (0-indexed)
+                    },
+                    { 
+                        "orderable": false, 
+                        "targets": [6] // Trading Range column (0-indexed) - not sortable
                     },
                     { 
                         "orderable": true, 

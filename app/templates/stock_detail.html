@@ -46,6 +46,58 @@
             font-size: 1.2em;
             color: #333;
         }
+        .trading-range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+        .trading-range-current {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #333;
+        }
+        .trading-range-bar {
+            position: relative;
+            height: 28px;
+            background: linear-gradient(to right, 
+                rgba(60, 179, 113, 0.4) 0%, 
+                rgba(60, 179, 113, 0.4) 33.33%,
+                rgba(150, 150, 150, 0.2) 33.33%,
+                rgba(150, 150, 150, 0.2) 66.67%,
+                rgba(255, 182, 193, 0.4) 66.67%,
+                rgba(255, 182, 193, 0.4) 100%);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: visible;
+        }
+        .trading-range-dma-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #000;
+            z-index: 1;
+        }
+        .trading-range-dot {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            z-index: 2;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+        .trading-range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +149,44 @@
                             {% else %}
                                 <span class="badge bg-secondary">{{ metrics.signal }}</span>
                             {% endif %}
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Trading Range</div>
+                        <div class="metric-value">
+                            {% set dot_position = (50 + (metrics.devstep / 3) * 50) %}
+                            {% if dot_position < 0 %}
+                                {% set dot_position = 0 %}
+                            {% elif dot_position > 100 %}
+                                {% set dot_position = 100 %}
+                            {% endif %}
+                            {% set dot_color = "#28a745" if metrics.devstep < -1 else ("#6c757d" if metrics.devstep <= 1 else "#dc3545") %}
+                            <div class="trading-range-container">
+                                <div class="trading-range-current">
+                                    {% if metrics.signal == "Extreme Oversold" %}
+                                        Extreme OS
+                                    {% elif metrics.signal == "Oversold" %}
+                                        Oversold
+                                    {% elif metrics.signal == "Neutral" %}
+                                        Neutral
+                                    {% elif metrics.signal == "Overbought" %}
+                                        Overbought
+                                    {% elif metrics.signal == "Extreme Overbought" %}
+                                        Extreme OB
+                                    {% else %}
+                                        {{ metrics.signal }}
+                                    {% endif %}
+                                </div>
+                                <div class="trading-range-bar">
+                                    <div class="trading-range-dma-line"></div>
+                                    <div class="trading-range-dot" style="left: {{ dot_position|round(1) }}%; background-color: {{ dot_color }};"></div>
+                                </div>
+                                <div class="trading-range-labels">
+                                    <span>OS</span>
+                                    <span>50-DMA</span>
+                                    <span>OB</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -482,7 +482,7 @@ Each stock has a dedicated detail page accessible by clicking the ticker symbol 
 
 - **Interactive Candlestick Chart**: Plotly.js-powered chart showing 365 days of daily price data
 - **SMA Overlays**: 50-day and 200-day Simple Moving Averages displayed as lines on the chart
-- **Standard Deviation Bands**: Light-colored shaded areas showing ±1 and ±2 standard deviation bands around the 50-day SMA
+- **Standard Deviation Bands**: Color-coded shaded areas showing standard deviation bands around the 50-day SMA
 - **Current Metrics Panel**: Sidebar showing current price, SMAs, 50D STDDEV, and signal
 - **Responsive Design**: Chart and metrics adapt to different screen sizes
 - **Color-Coded Signals**: Visual badges matching the signal classification system
@@ -490,7 +490,12 @@ Each stock has a dedicated detail page accessible by clicking the ticker symbol 
 ### Chart Features
 
 - **Candlestick Visualization**: Green candles for price increases, red for decreases
-- **Standard Deviation Bands**: Light gray shaded areas showing ±1 STD (inner) and ±2 STD (outer) bands around the 50-day SMA
+- **Standard Deviation Bands**: Color-coded bands showing price zones:
+  - **Gray**: Neutral zone (-1 to +1 STD)
+  - **Light Red/Pink**: Moderate overbought zone (+1 to +2 STD)
+  - **Darker Red**: Extreme overbought zone (+2 to +3 STD)
+  - **Slightly Darker Green**: Moderate oversold zone (-1 to -2 STD)
+  - **Light Green**: Extreme oversold zone (-2 to -3 STD)
 - **Interactive Tooltips**: Hover over any point to see detailed price information
 - **Zoom and Pan**: Built-in Plotly.js controls for exploring the data
 - **Date Range**: Displays the past 365 days of trading data (fetches 2 years to enable proper SMA calculations)

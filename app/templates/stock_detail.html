@@ -114,64 +114,13 @@
         const sma200Data = {{ chart_data.sma_200 | tojson }};
         const stdBands = {{ chart_data.std_bands | tojson }};
         
-        // Create STD dev bands as area charts (background layers)
-        // 2 STD band (outer)
+        // Extract STD band data for area charts
+        const std3Upper = stdBands.std_3_upper.map(d => d.y);
+        const std3Lower = stdBands.std_3_lower.map(d => d.y);
         const std2Upper = stdBands.std_2_upper.map(d => d.y);
         const std2Lower = stdBands.std_2_lower.map(d => d.y);
-        const std2UpperTrace = {
-            x: stdBands.std_2_upper.map(d => d.x),
-            y: std2Upper,
-            type: 'scatter',
-            mode: 'lines',
-            name: '±2 STD',
-            line: {width: 0},
-            fillcolor: 'rgba(200, 200, 200, 0.2)',
-            fill: 'tonexty',
-            showlegend: false,
-            hoverinfo: 'skip'
-        };
-        const std2LowerTrace = {
-            x: stdBands.std_2_lower.map(d => d.x),
-            y: std2Lower,
-            type: 'scatter',
-            mode: 'lines',
-            name: '±2 STD',
-            line: {width: 0},
-            fillcolor: 'rgba(200, 200, 200, 0.2)',
-            fill: 'tonexty',
-            showlegend: true,
-            legendgroup: 'std2',
-            hoverinfo: 'skip'
-        };
-        
-        // 1 STD band (inner)
         const std1Upper = stdBands.std_1_upper.map(d => d.y);
         const std1Lower = stdBands.std_1_lower.map(d => d.y);
-        const std1UpperTrace = {
-            x: stdBands.std_1_upper.map(d => d.x),
-            y: std1Upper,
-            type: 'scatter',
-            mode: 'lines',
-            name: '±1 STD',
-            line: {width: 0},
-            fillcolor: 'rgba(150, 150, 150, 0.15)',
-            fill: 'tonexty',
-            showlegend: false,
-            hoverinfo: 'skip'
-        };
-        const std1LowerTrace = {
-            x: stdBands.std_1_lower.map(d => d.x),
-            y: std1Lower,
-            type: 'scatter',
-            mode: 'lines',
-            name: '±1 STD',
-            line: {width: 0},
-            fillcolor: 'rgba(150, 150, 150, 0.15)',
-            fill: 'tonexty',
-            showlegend: true,
-            legendgroup: 'std1',
-            hoverinfo: 'skip'
-        };
         
         // Create SMA 200 trace (background line)
         const sma200Trace = {
@@ -217,21 +166,63 @@
         // For Plotly area charts, we need to combine upper and lower in a single trace
         const dates = stdBands.std_2_upper.map(d => d.x);
         
-        // 2 STD band area
-        const std2AreaTrace = {
+        // +2 SD to +3 SD band area (darker red - extreme overbought/rich)
+        const stdPos3AreaTrace = {
             x: dates.concat(dates.slice().reverse()),
-            y: std2Upper.concat(std2Lower.slice().reverse()),
+            y: std3Upper.concat(std2Upper.slice().reverse()),
             type: 'scatter',
             mode: 'lines',
-            name: '±2 STD',
+            name: '+2 to +3 STD',
             fill: 'toself',
-            fillcolor: 'rgba(200, 200, 200, 0.2)',
+            fillcolor: 'rgba(220, 20, 60, 0.3)',
             line: {color: 'transparent'},
             showlegend: true,
             hoverinfo: 'skip'
         };
         
-        // 1 STD band area
+        // -2 SD to -3 SD band area (light green - extreme oversold/cheap)
+        const stdNeg3AreaTrace = {
+            x: dates.concat(dates.slice().reverse()),
+            y: std2Lower.concat(std3Lower.slice().reverse()),
+            type: 'scatter',
+            mode: 'lines',
+            name: '-2 to -3 STD',
+            fill: 'toself',
+            fillcolor: 'rgba(144, 238, 144, 0.3)',
+            line: {color: 'transparent'},
+            showlegend: true,
+            hoverinfo: 'skip'
+        };
+        
+        // +1 SD to +2 SD band area (light red/pink - moderate overbought/rich)
+        const stdPosAreaTrace = {
+            x: dates.concat(dates.slice().reverse()),
+            y: std2Upper.concat(std1Upper.slice().reverse()),
+            type: 'scatter',
+            mode: 'lines',
+            name: '+1 to +2 STD',
+            fill: 'toself',
+            fillcolor: 'rgba(255, 182, 193, 0.3)',
+            line: {color: 'transparent'},
+            showlegend: true,
+            hoverinfo: 'skip'
+        };
+        
+        // -1 SD to -2 SD band area (slightly darker green - moderate oversold/cheap)
+        const stdNegAreaTrace = {
+            x: dates.concat(dates.slice().reverse()),
+            y: std1Lower.concat(std2Lower.slice().reverse()),
+            type: 'scatter',
+            mode: 'lines',
+            name: '-1 to -2 STD',
+            fill: 'toself',
+            fillcolor: 'rgba(60, 179, 113, 0.3)',
+            line: {color: 'transparent'},
+            showlegend: true,
+            hoverinfo: 'skip'
+        };
+        
+        // -1 SD to +1 SD band area (gray - neutral zone)
         const std1AreaTrace = {
             x: dates.concat(dates.slice().reverse()),
             y: std1Upper.concat(std1Lower.slice().reverse()),
@@ -245,7 +236,7 @@
             hoverinfo: 'skip'
         };
         
-        const data = [std2AreaTrace, std1AreaTrace, sma200Trace, sma50Trace, candlestickTrace];
+        const data = [stdPos3AreaTrace, stdNeg3AreaTrace, stdPosAreaTrace, stdNegAreaTrace, std1AreaTrace, sma200Trace, sma50Trace, candlestickTrace];
         
         const layout = {
             title: {

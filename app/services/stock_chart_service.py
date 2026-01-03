@@ -64,8 +64,10 @@ def get_stock_chart_data(ticker: str) -> Dict[str, Any]:
     # Calculate STD dev bands around SMA 50
     data['SMA_50_plus_1std'] = data['SMA_50'] + data['STD_50']
     data['SMA_50_plus_2std'] = data['SMA_50'] + (2 * data['STD_50'])
+    data['SMA_50_plus_3std'] = data['SMA_50'] + (3 * data['STD_50'])
     data['SMA_50_minus_1std'] = data['SMA_50'] - data['STD_50']
     data['SMA_50_minus_2std'] = data['SMA_50'] - (2 * data['STD_50'])
+    data['SMA_50_minus_3std'] = data['SMA_50'] - (3 * data['STD_50'])
     
     # Filter to show data from Jan 1, 2025 onwards (or last 365 days if Jan 1, 2025 is not available)
     # Handle timezone-aware index by normalizing to timezone-naive for comparison
@@ -113,6 +115,8 @@ def get_stock_chart_data(ticker: str) -> Dict[str, Any]:
     std_1_lower = []
     std_2_upper = []
     std_2_lower = []
+    std_3_upper = []
+    std_3_lower = []
     
     for i, (date, row) in enumerate(display_data.iterrows()):
         date_str = date.strftime('%Y-%m-%d')
@@ -148,11 +152,21 @@ def get_stock_chart_data(ticker: str) -> Dict[str, Any]:
                 'x': date_str,
                 'y': float(row['SMA_50_minus_2std']) if pd.notna(row['SMA_50_minus_2std']) else None
             })
+            std_3_upper.append({
+                'x': date_str,
+                'y': float(row['SMA_50_plus_3std']) if pd.notna(row['SMA_50_plus_3std']) else None
+            })
+            std_3_lower.append({
+                'x': date_str,
+                'y': float(row['SMA_50_minus_3std']) if pd.notna(row['SMA_50_minus_3std']) else None
+            })
         else:
             std_1_upper.append({'x': date_str, 'y': None})
             std_1_lower.append({'x': date_str, 'y': None})
             std_2_upper.append({'x': date_str, 'y': None})
             std_2_lower.append({'x': date_str, 'y': None})
+            std_3_upper.append({'x': date_str, 'y': None})
+            std_3_lower.append({'x': date_str, 'y': None})
     
     # Get current values (from full dataset)
     current_price = float(data['Close'].iloc[-1])
@@ -169,7 +183,9 @@ def get_stock_chart_data(ticker: str) -> Dict[str, Any]:
             "std_1_upper": std_1_upper,
             "std_1_lower": std_1_lower,
             "std_2_upper": std_2_upper,
-            "std_2_lower": std_2_lower
+            "std_2_lower": std_2_lower,
+            "std_3_upper": std_3_upper,
+            "std_3_lower": std_3_lower
         },
         "current_price": round(current_price, 2),
         "sma_50_current": round(sma_50_current, 2),

@@ -202,7 +202,7 @@ async def results(request: Request, tickers: str = Query(..., description="Comma
                 metric['current_price_formatted'] = f"${metric['current_price']:.2f}"
                 metric['sma_50_formatted'] = f"${metric['sma_50']:.2f}"
                 metric['sma_200_formatted'] = f"${metric['sma_200']:.2f}"
-                metric['stddev_50d_formatted'] = f"{metric['devstep']:.4f}"
+                metric['stddev_50d_formatted'] = f"{metric['devstep']:.1f}"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching stock data: {str(e)}")
     

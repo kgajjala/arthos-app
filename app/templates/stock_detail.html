@@ -128,7 +128,7 @@
             y: sma200Data.map(d => d.y),
             type: 'scatter',
             mode: 'lines',
-            name: 'SMA 200',
+            name: '200-day SMA',
             line: {
                 color: '#2196f3',
                 width: 2
@@ -141,7 +141,7 @@
             y: sma50Data.map(d => d.y),
             type: 'scatter',
             mode: 'lines',
-            name: 'SMA 50',
+            name: '50-day SMA',
             line: {
                 color: '#ff9800',
                 width: 2
@@ -176,7 +176,7 @@
             fill: 'toself',
             fillcolor: 'rgba(220, 20, 60, 0.3)',
             line: {color: 'transparent'},
-            showlegend: true,
+            showlegend: false,
             hoverinfo: 'skip'
         };
         
@@ -190,7 +190,7 @@
             fill: 'toself',
             fillcolor: 'rgba(144, 238, 144, 0.3)',
             line: {color: 'transparent'},
-            showlegend: true,
+            showlegend: false,
             hoverinfo: 'skip'
         };
         
@@ -204,7 +204,7 @@
             fill: 'toself',
             fillcolor: 'rgba(255, 182, 193, 0.3)',
             line: {color: 'transparent'},
-            showlegend: true,
+            showlegend: false,
             hoverinfo: 'skip'
         };
         
@@ -218,7 +218,7 @@
             fill: 'toself',
             fillcolor: 'rgba(60, 179, 113, 0.3)',
             line: {color: 'transparent'},
-            showlegend: true,
+            showlegend: false,
             hoverinfo: 'skip'
         };
         
@@ -232,7 +232,7 @@
             fill: 'toself',
             fillcolor: 'rgba(150, 150, 150, 0.15)',
             line: {color: 'transparent'},
-            showlegend: true,
+            showlegend: false,
             hoverinfo: 'skip'
         };
         
@@ -258,9 +258,13 @@
             hovermode: 'x unified',
             showlegend: true,
             legend: {
-                x: 0,
-                y: 1,
-                bgcolor: 'rgba(255, 255, 255, 0.8)'
+                orientation: 'h',
+                x: 0.5,
+                xanchor: 'center',
+                y: -0.15,
+                yanchor: 'top',
+                bgcolor: 'rgba(255, 255, 255, 0.8)',
+                tracegroupgap: 30
             },
             plot_bgcolor: 'white',
             paper_bgcolor: 'white'

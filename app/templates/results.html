@@ -64,8 +64,16 @@
             height: 10px;
             border-radius: 50%;
             border: 2px solid #fff;
-            z-index: 2;
+            z-index: 3;
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+        .trading-range-tail {
+            position: absolute;
+            top: 50%;
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            transform: translateY(-50%);
         }
         .trading-range-labels {
             display: flex;
@@ -138,6 +146,13 @@
                                     </div>
                                     <div class="trading-range-bar">
                                         <div class="trading-range-dma-line"></div>
+                                        {% if dot_position != 50 %}
+                                            {% if dot_position < 50 %}
+                                                <div class="trading-range-tail" style="left: {{ dot_position|round(1) }}%; width: {{ (50 - dot_position)|round(1) }}%;"></div>
+                                            {% else %}
+                                                <div class="trading-range-tail" style="left: 50%; width: {{ (dot_position - 50)|round(1) }}%;"></div>
+                                            {% endif %}
+                                        {% endif %}
                                         <div class="trading-range-dot" style="left: {{ dot_position|round(1) }}%; background-color: {{ dot_color }};"></div>
                                     </div>
                                     <div class="trading-range-labels">

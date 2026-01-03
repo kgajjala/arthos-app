@@ -106,7 +106,7 @@ async def portfolio_details_page(request: Request, portfolio_id: UUID = FPath(..
                     metric['current_price_formatted'] = f"${metric['current_price']:.2f}"
                     metric['sma_50_formatted'] = f"${metric['sma_50']:.2f}"
                     metric['sma_200_formatted'] = f"${metric['sma_200']:.2f}"
-                    metric['stddev_50d_formatted'] = f"{metric['devstep']:.4f}"
+                    metric['stddev_50d_formatted'] = f"{metric['devstep']:.1f}"
         except Exception as e:
             # If there's an error fetching metrics, still show the page with error messages
             pass

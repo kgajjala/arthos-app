@@ -87,11 +87,7 @@
                         <th>Current Price</th>
                         <th>SMA 50</th>
                         <th>SMA 200</th>
-                        <th>50D STDDEV</th>
-                        <th>Signal</th>
                         <th>Trading Range</th>
-                        <th>Cached</th>
-                        <th>Cache Timestamp</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,27 +103,11 @@
                             {% endif %}
                         </td>
                         {% if 'error' in metric %}
-                            <td colspan="8" class="text-danger fw-bold">{{ metric.error }}</td>
+                            <td colspan="5" class="text-danger fw-bold">{{ metric.error }}</td>
                         {% else %}
                             <td>{{ metric.current_price_formatted }}</td>
                             <td>{{ metric.sma_50_formatted }}</td>
                             <td>{{ metric.sma_200_formatted }}</td>
-                            <td>{{ metric.stddev_50d_formatted }}</td>
-                            <td data-sort="{% if metric.signal == 'Extreme Oversold' %}5{% elif metric.signal == 'Oversold' %}4{% elif metric.signal == 'Neutral' %}3{% elif metric.signal == 'Overbought' %}2{% elif metric.signal == 'Extreme Overbought' %}1{% else %}0{% endif %}">
-                                {% if metric.signal == "Neutral" %}
-                                    <span class="badge bg-secondary">{{ metric.signal }}</span>
-                                {% elif metric.signal == "Overbought" %}
-                                    <span class="badge bg-warning text-dark">{{ metric.signal }}</span>
-                                {% elif metric.signal == "Extreme Overbought" %}
-                                    <span class="badge bg-danger">{{ metric.signal }}</span>
-                                {% elif metric.signal == "Oversold" %}
-                                    <span class="badge bg-info text-dark">{{ metric.signal }}</span>
-                                {% elif metric.signal == "Extreme Oversold" %}
-                                    <span class="badge bg-success">{{ metric.signal }}</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ metric.signal }}</span>
-                                {% endif %}
-                            </td>
                             <td>
                                 {% set dot_position = (50 + (metric.devstep / 3) * 50) %}
                                 {% if dot_position < 0 %}
@@ -139,17 +119,17 @@
                                 <div class="trading-range-container">
                                     <div class="trading-range-current">
                                         {% if metric.signal == "Extreme Oversold" %}
-                                            Extreme OS
+                                            <span class="badge bg-success">Extreme OS</span>
                                         {% elif metric.signal == "Oversold" %}
-                                            Oversold
+                                            <span class="badge bg-info text-dark">Oversold</span>
                                         {% elif metric.signal == "Neutral" %}
-                                            Neutral
+                                            <span class="badge bg-secondary">Neutral</span>
                                         {% elif metric.signal == "Overbought" %}
-                                            Overbought
+                                            <span class="badge bg-warning text-dark">Overbought</span>
                                         {% elif metric.signal == "Extreme Overbought" %}
-                                            Extreme OB
+                                            <span class="badge bg-danger">Extreme OB</span>
                                         {% else %}
-                                            {{ metric.signal }}
+                                            <span class="badge bg-secondary">{{ metric.signal }}</span>
                                         {% endif %}
                                     </div>
                                     <div class="trading-range-bar">
@@ -163,14 +143,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                {% if metric.cached %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ metric.cache_timestamp if metric.cached else "-" }}</td>
                         {% endif %}
                     </tr>
                     {% endfor %}
@@ -198,15 +170,11 @@
             
             $('#metricsTable').DataTable({
                 "pageLength": 100,
-                "order": [[5, "desc"]], // Sort by Signal column descending (Extreme Oversold=5 first)
+                "order": [[0, "asc"]], // Sort by Ticker column ascending
                 "columnDefs": [
                     { 
-                        "type": "dom-data-sort",
-                        "targets": [5] // Signal column (0-indexed)
-                    },
-                    { 
                         "orderable": false, 
-                        "targets": [6] // Trading Range column (0-indexed) - not sortable
+                        "targets": [4] // Trading Range column (0-indexed) - not sortable
                     },
                     { 
                         "orderable": true, 

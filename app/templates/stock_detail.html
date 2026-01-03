@@ -130,28 +130,6 @@
                         <div class="metric-value">${{ "%.2f"|format(metrics.sma_200) }}</div>
                     </div>
                     <div class="metric-item">
-                        <div class="metric-label">50D STDDEV</div>
-                        <div class="metric-value">{{ "%.1f"|format(metrics.devstep) }}</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-label">Signal</div>
-                        <div class="metric-value">
-                            {% if metrics.signal == "Neutral" %}
-                                <span class="badge bg-secondary">{{ metrics.signal }}</span>
-                            {% elif metrics.signal == "Overbought" %}
-                                <span class="badge bg-warning text-dark">{{ metrics.signal }}</span>
-                            {% elif metrics.signal == "Extreme Overbought" %}
-                                <span class="badge bg-danger">{{ metrics.signal }}</span>
-                            {% elif metrics.signal == "Oversold" %}
-                                <span class="badge bg-info text-dark">{{ metrics.signal }}</span>
-                            {% elif metrics.signal == "Extreme Oversold" %}
-                                <span class="badge bg-success">{{ metrics.signal }}</span>
-                            {% else %}
-                                <span class="badge bg-secondary">{{ metrics.signal }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="metric-item">
                         <div class="metric-label">Trading Range</div>
                         <div class="metric-value">
                             {% set dot_position = (50 + (metrics.devstep / 3) * 50) %}
@@ -164,17 +142,17 @@
                             <div class="trading-range-container">
                                 <div class="trading-range-current">
                                     {% if metrics.signal == "Extreme Oversold" %}
-                                        Extreme OS
+                                        <span class="badge bg-success">Extreme OS</span>
                                     {% elif metrics.signal == "Oversold" %}
-                                        Oversold
+                                        <span class="badge bg-info text-dark">Oversold</span>
                                     {% elif metrics.signal == "Neutral" %}
-                                        Neutral
+                                        <span class="badge bg-secondary">Neutral</span>
                                     {% elif metrics.signal == "Overbought" %}
-                                        Overbought
+                                        <span class="badge bg-warning text-dark">Overbought</span>
                                     {% elif metrics.signal == "Extreme Overbought" %}
-                                        Extreme OB
+                                        <span class="badge bg-danger">Extreme OB</span>
                                     {% else %}
-                                        {{ metrics.signal }}
+                                        <span class="badge bg-secondary">{{ metrics.signal }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="trading-range-bar">

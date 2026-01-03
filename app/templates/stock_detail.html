@@ -83,19 +83,12 @@
             position: absolute;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            border: 2px solid #fff;
+            border: 2px solid #000;
             z-index: 2;
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
-        }
-        .trading-range-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75em;
-            color: #666;
-            margin-top: 2px;
         }
     </style>
 </head>
@@ -160,11 +153,6 @@
                                 <div class="trading-range-bar">
                                     <div class="trading-range-dma-line"></div>
                                     <div class="trading-range-dot" style="left: {{ dot_position|round(1) }}%; background-color: {{ dot_color }};"></div>
-                                </div>
-                                <div class="trading-range-labels">
-                                    <span>OS</span>
-                                    <span>50-DMA</span>
-                                    <span>OB</span>
                                 </div>
                             </div>
                         </div>
